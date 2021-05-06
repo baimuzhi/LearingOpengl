@@ -1,0 +1,18 @@
+﻿  main.cpp
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(229,27): warning C4244: “=”: 从“double”转换到“T”，可能丢失数据
+          with
+          [
+              T=float
+          ]
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(230,27): warning C4244: “=”: 从“double”转换到“T”，可能丢失数据
+          with
+          [
+              T=float
+          ]
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(231,27): warning C4244: “=”: 从“double”转换到“T”，可能丢失数据
+          with
+          [
+              T=float
+          ]
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(311,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+  LearnOpenGL.vcxproj -> D:\VSProject\LearnOpenGL\LearnOpenGL\x64\Debug\LearnOpenGL.exe
