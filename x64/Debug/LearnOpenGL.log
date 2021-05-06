@@ -1,3 +1,15 @@
 ﻿  main.cpp
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(333,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(268,62): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(269,66): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(276,62): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(277,66): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(284,62): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(285,66): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(292,62): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(293,66): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(301,57): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(302,61): warning C4305: “参数”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(389,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+  shader.cpp
+  正在生成代码...
   LearnOpenGL.vcxproj -> D:\VSProject\LearnOpenGL\LearnOpenGL\x64\Debug\LearnOpenGL.exe
