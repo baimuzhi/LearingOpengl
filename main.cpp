@@ -65,12 +65,26 @@ unsigned int indices[] = { // 注意索引从0开始!
     1, 2, 3  // 第二个三角形
 };
 
+// positions all containers
+glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 6.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -80,6 +94,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.0f, 0.0f, 2.0f);
+glm::vec3 lightDirction(-0.2f, -1.0f, -0.3f);
 
 int main()
 {
@@ -182,7 +197,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("res\\awesomeface.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("res\\container2_specular.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -198,7 +213,7 @@ int main()
     ourShader.use();
 
     ourShader.setInt("material.diffuse", 0);
-    ourShader.setInt("ourTexture2", 1);
+    ourShader.setInt("material.specular", 1);
 
     // Wireframe Mode
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -220,21 +235,20 @@ int main()
         ourShader.setVector3("viewPos", camera.Position);
 
         // Material.
-        ourShader.setVector3("material.ambient", 1.0f, 0.5f, 0.31f);
-        ourShader.setVector3("material.diffuse", 1.0f, 0.5f, 0.31f);
         ourShader.setVector3("material.specular", 0.5f, 0.5f, 0.5f);
         ourShader.setFloat("material.shininess", 32.0f);
 
         glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        lightColor.x = 0.5f;
+        lightColor.y = 0.5f;
+        lightColor.z = 0.5f;
 
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // 降低影响
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
 
         // Light
-        ourShader.setVector3("light.position", lightPos);
+        //ourShader.setVector3("light.position", lightPos);
+        ourShader.setVector3("light.direction", lightDirction);
         ourShader.setVector3("light.ambient", ambientColor);
         ourShader.setVector3("light.diffuse", diffuseColor); // 将光照调暗了一些以搭配场景
         ourShader.setVector3("light.specular", 1.0f, 1.0f, 1.0f);
@@ -256,19 +270,18 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-       //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        lightShader.use();
-        lightShader.setMatrix4("projection", projection);
-        lightShader.setMatrix4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); // a smaller cube
-        lightShader.setMatrix4("model", model);
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            ourShader.setMatrix4("model", model);
 
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
