@@ -247,11 +247,14 @@ int main()
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
 
         // Light
-        //ourShader.setVector3("light.position", lightPos);
-        ourShader.setVector3("light.direction", lightDirction);
-        ourShader.setVector3("light.ambient", ambientColor);
-        ourShader.setVector3("light.diffuse", diffuseColor); // 将光照调暗了一些以搭配场景
+        ourShader.setVector3("light.position", lightPos);
+        //ourShader.setVector3("light.direction", lightDirction);
+        ourShader.setVector3("light.ambient", 0.2f, 0.2f, 0.2f);
+        ourShader.setVector3("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
         ourShader.setVector3("light.specular", 1.0f, 1.0f, 1.0f);
+        ourShader.setFloat("light.constant", 1.0f);
+        ourShader.setFloat("light.linear", 0.09f);
+        ourShader.setFloat("light.quadratic", 0.032f);
 
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::rotate(model, 0.5f, glm::vec3(1.0f, 0.0f, 0.0f));
