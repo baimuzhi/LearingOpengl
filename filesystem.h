@@ -23,7 +23,7 @@ private:
     static std::string const& getRoot()
     {
         static char const* envRoot = getenv("LOGL_ROOT_PATH");
-        std::string lroot = "D:\\VSProject\\LearnOpenGL\\LearnOpenGL\\";
+        std::string lroot = "D:/VSProject/LearnOpenGL/LearnOpenGL/";
         static char const* givenRoot = (envRoot != nullptr ? envRoot : lroot.c_str());
         static std::string root = (givenRoot != nullptr ? givenRoot : "");
         return root;
