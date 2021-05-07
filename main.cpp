@@ -111,6 +111,9 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS); // always pass the depth test (same effect as glDisable(GL_DEPTH_TEST))
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // build and compile shaders
     // -------------------------
     Shader shader("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps");
@@ -233,7 +236,7 @@ int main()
     // -------------
     unsigned int cubeTexture = loadTexture(FileSystem::getPath("res/cork-board.png").c_str());
     unsigned int floorTexture = loadTexture(FileSystem::getPath("res/herringbone.png").c_str());
-    unsigned int transparentTexture = loadTexture(FileSystem::getPath("res/grass.png").c_str());
+    unsigned int transparentTexture = loadTexture(FileSystem::getPath("res/blending_transparent_window.png").c_str());
 
     // shader configuration
     // --------------------
@@ -262,6 +265,13 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        std::map<float, glm::vec3> sorted;
+        for (unsigned int i = 0; i < vegetation.size(); i++)
+        {
+            float distance = glm::length(camera.Position - vegetation[i]);
+            sorted[distance] = vegetation[i];
+        }
+
         // draw objects
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -289,10 +299,10 @@ int main()
         // vegetation
         glBindVertexArray(transparentVAO);
         glBindTexture(GL_TEXTURE_2D, transparentTexture);
-        for (unsigned int i = 0; i < vegetation.size(); i++)
+        for (auto iter = sorted.rbegin(); iter != sorted.rend(); iter++)
         {
             model = glm::mat4(1.0f);
-            model = glm::translate(model, vegetation[i]);
+            model = glm::translate(model, iter->second);
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
