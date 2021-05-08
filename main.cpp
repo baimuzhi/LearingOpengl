@@ -156,7 +156,7 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader screenshader("x64\\Debug\\shader\\screen.vs", "x64\\Debug\\shader\\screen.ps");
-    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps");
+    Shader shader("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps");
     Shader shaderGreen("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\green.ps");
     Shader shaderBlue("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\blue.ps");
     Shader shaderYellow("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\yellow.ps");
@@ -238,6 +238,37 @@ int main()
     -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // 左下
     };
 
+    float tinyquadVertices[] = {
+        // 位置          // 颜色
+        -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+         0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
+        -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
+
+        -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
+         0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
+         0.05f,  0.05f,  0.0f, 1.0f, 1.0f
+    };
+
+    glm::vec2 translations[100];
+    int index = 0;
+    float offset = 0.1f;
+    for (int y = -10; y < 10; y += 2)
+    {
+        for (int x = -10; x < 10; x += 2)
+        {
+            glm::vec2 translation;
+            translation.x = (float)x / 10.0f + offset;
+            translation.y = (float)y / 10.0f + offset;
+            translations[index++] = translation;
+        }
+    }
+
+    unsigned int instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -262,18 +293,23 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glBindVertexArray(0);
-    // Point VAO
-    unsigned int pointVAO, pointVBO;
-    glGenVertexArrays(1, &pointVAO);
-    glGenBuffers(1, &pointVBO);
-    glBindVertexArray(pointVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    // TinyQuad VAO
+    unsigned int tinyquadVAO, tinyquadVBO;
+    glGenVertexArrays(1, &tinyquadVAO);
+    glGenBuffers(1, &tinyquadVBO);
+    glBindVertexArray(tinyquadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, tinyquadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tinyquadVertices), tinyquadVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
-    glBindVertexArray(0);
+    // also set instance data
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(2, 1); // tell OpenGL this is an instanced vertex attribute.
 
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
@@ -303,30 +339,6 @@ int main()
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(shaderRed.ID, "Matrices");
-    unsigned int uniformBlockIndexGreen = glGetUniformBlockIndex(shaderGreen.ID, "Matrices");
-    unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(shaderBlue.ID, "Matrices");
-    unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(shaderYellow.ID, "Matrices");
-
-    glUniformBlockBinding(shaderRed.ID, uniformBlockIndexRed, 0);
-    glUniformBlockBinding(shaderGreen.ID, uniformBlockIndexGreen, 0);
-    glUniformBlockBinding(shaderBlue.ID, uniformBlockIndexBlue, 0);
-    glUniformBlockBinding(shaderYellow.ID, uniformBlockIndexYellow, 0);
-
-    unsigned int uboMatrices;
-    glGenBuffers(1, &uboMatrices);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
-
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
     Model ourModel(FileSystem::getPath("res/nanosuit/nanosuit.obj"));
 
     // render loop
@@ -351,62 +363,10 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        std::map<float, glm::vec3> sorted;
-        for (unsigned int i = 0; i < vegetation.size(); i++)
-        {
-            float distance = glm::length(camera.Position - vegetation[i]);
-            sorted[distance] = vegetation[i];
-        }
-
-        // draw objects
- 
-        // 第一处理阶段(Pass)
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 我们现在不使用模板缓冲
-        glEnable(GL_DEPTH_TEST);
-
-        glm::mat4 view = camera.GetViewMatrix();
-        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        // draw 4 cubes 
-        // RED
-        //glBindVertexArray(pointVAO);
-        //shaderRed.use();
-        //glm::mat4 model = glm::mat4(1.0f);
-        ////model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
-        //shaderRed.setMat4("model", model);
-        //glDrawArrays(GL_POINTS, 0, 4);
-
-        shaderRed.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
-        shaderRed.setFloat("time", glfwGetTime());
-        shaderRed.setMat4("projection", projection);
-        shaderRed.setMat4("view", view);
-        shaderRed.setMat4("model", model);
-        ourModel.Draw(shaderRed);
-
-        shaderNormal.use();
-        shaderNormal.setMat4("projection", projection);
-        shaderNormal.setMat4("view", view);
-        shaderNormal.setMat4("model", model);
-        ourModel.Draw(shaderNormal);
-
-        // 第二处理阶段
-        glBindFramebuffer(GL_FRAMEBUFFER, 0); // 返回默认
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        screenshader.use();
-        glBindVertexArray(quadVAO);
-        glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-        glDrawArrays(GL_TRIANGLES, 0, 6); 
-        
+        shader.use();
+        glBindVertexArray(tinyquadVAO);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100); // 100 triangles of 6 vertices each
+        glBindVertexArray(0);
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
