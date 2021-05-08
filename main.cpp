@@ -96,8 +96,17 @@ int main()
     Shader shaderBloomFinal("x64\\Debug\\shader\\7.bloom_final.vs", "x64\\Debug\\shader\\7.bloom_final.fs");
 
     shader.use();
-    shader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
-    shader.setFloat("ao", 1.0f);
+    shader.setInt("albedoMap", 0);
+    shader.setInt("normalMap", 1);
+    shader.setInt("metallicMap", 2);
+    shader.setInt("roughnessMap", 3);
+    shader.setInt("aoMap", 4);
+
+    unsigned int albedo = loadTexture(FileSystem::getPath("res/pbr/rusted_iron/albedo.png").c_str(), true);
+    unsigned int normal = loadTexture(FileSystem::getPath("res/pbr/rusted_iron/normal.png").c_str(), false);
+    unsigned int metallic = loadTexture(FileSystem::getPath("res/pbr/rusted_iron/metallic.png").c_str(), false);
+    unsigned int roughness = loadTexture(FileSystem::getPath("res/pbr/rusted_iron/roughness.png").c_str(), false);
+    unsigned int ao = loadTexture(FileSystem::getPath("res/pbr/rusted_iron/ao.png").c_str(), true);
 
     // lights
     // ------
@@ -145,6 +154,17 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         shader.setMat4("view", view);
         shader.setVec3("camPos", camera.Position);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, albedo);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, normal);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, metallic);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, roughness);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, ao);
 
         // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
         glm::mat4 model = glm::mat4(1.0f);
