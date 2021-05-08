@@ -156,7 +156,7 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader screenshader("x64\\Debug\\shader\\screen.vs", "x64\\Debug\\shader\\screen.ps");
-    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\red.ps");
+    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\red.ps", "x64\\Debug\\shader\\house.gs");
     Shader shaderGreen("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\green.ps");
     Shader shaderBlue("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\blue.ps");
     Shader shaderYellow("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\yellow.ps");
@@ -230,6 +230,13 @@ int main()
          1.0f,  1.0f,  1.0f, 1.0f
     };
 
+    float points[] = {
+    -0.5f,  0.5f, 1.0f, 0.0f, 0.0f, // 左上
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, // 右上
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // 右下
+    -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // 左下
+    };
+
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -253,6 +260,18 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glBindVertexArray(0);
+    // Point VAO
+    unsigned int pointVAO, pointVBO;
+    glGenVertexArrays(1, &pointVAO);
+    glGenBuffers(1, &pointVBO);
+    glBindVertexArray(pointVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
     glBindVertexArray(0);
 
     unsigned int framebuffer;
@@ -351,30 +370,12 @@ int main()
 
         // draw 4 cubes 
         // RED
-        glBindVertexArray(cubeVAO);
+        glBindVertexArray(pointVAO);
         shaderRed.use();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
+        //model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
         shaderRed.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        // GREEN
-        shaderGreen.use();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f)); // move top-right
-        shaderGreen.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        // YELLOW
-        shaderYellow.use();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f)); // move bottom-left
-        shaderYellow.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        // BLUE
-        shaderBlue.use();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f)); // move bottom-right
-        shaderBlue.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, 4);
 
         // 第二处理阶段
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // 返回默认
