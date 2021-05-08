@@ -156,7 +156,7 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader screenshader("x64\\Debug\\shader\\screen.vs", "x64\\Debug\\shader\\screen.ps");
-    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\red.ps", "x64\\Debug\\shader\\house.gs");
+    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps", "x64\\Debug\\shader\\house.gs");
     Shader shaderGreen("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\green.ps");
     Shader shaderBlue("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\blue.ps");
     Shader shaderYellow("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\yellow.ps");
@@ -326,6 +326,8 @@ int main()
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    Model ourModel(FileSystem::getPath("res/nanosuit/nanosuit.obj"));
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -370,12 +372,22 @@ int main()
 
         // draw 4 cubes 
         // RED
-        glBindVertexArray(pointVAO);
+        //glBindVertexArray(pointVAO);
+        //shaderRed.use();
+        //glm::mat4 model = glm::mat4(1.0f);
+        ////model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
+        //shaderRed.setMat4("model", model);
+        //glDrawArrays(GL_POINTS, 0, 4);
+
         shaderRed.use();
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f)); // move top-left
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));	// it's a bit too big for our scene, so scale it down
+        shaderRed.setFloat("time", glfwGetTime());
+        shaderRed.setMat4("projection", projection);
+        shaderRed.setMat4("view", view);
         shaderRed.setMat4("model", model);
-        glDrawArrays(GL_POINTS, 0, 4);
+        ourModel.Draw(shaderRed);
 
         // 第二处理阶段
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // 返回默认
