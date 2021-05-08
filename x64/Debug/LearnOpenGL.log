@@ -1,15 +1,17 @@
 ﻿  main.cpp
 D:\VSProject\LearnOpenGL\LearnOpenGL\mesh.h(84,1): warning C4267: “参数”: 从“size_t”转换到“GLsizei”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(140,28): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(389,17): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(390,17): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(394,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(395,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(397,13): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(398,13): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(477,39): warning C4305: “初始化”: 从“double”到“float”截断
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(515,36): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(542,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(544,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
-D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(546,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(292,31): warning C4244: “初始化”: 从“double”转换到“unsigned int”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(293,32): warning C4244: “初始化”: 从“double”转换到“unsigned int”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(357,28): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(620,17): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(621,17): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(625,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(626,19): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(628,13): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(629,13): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(708,39): warning C4305: “初始化”: 从“double”到“float”截断
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(746,36): warning C4267: “=”: 从“size_t”转换到“unsigned int”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(773,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(775,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
+D:\VSProject\LearnOpenGL\LearnOpenGL\main.cpp(777,57): warning C4244: “参数”: 从“float”转换到“GLsizei”，可能丢失数据
   LearnOpenGL.vcxproj -> D:\VSProject\LearnOpenGL\LearnOpenGL\x64\Debug\LearnOpenGL.exe
