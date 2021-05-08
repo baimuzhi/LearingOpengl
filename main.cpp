@@ -156,10 +156,11 @@ int main()
     // build and compile shaders
     // -------------------------
     Shader screenshader("x64\\Debug\\shader\\screen.vs", "x64\\Debug\\shader\\screen.ps");
-    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps", "x64\\Debug\\shader\\house.gs");
+    Shader shaderRed("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\shader.ps");
     Shader shaderGreen("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\green.ps");
     Shader shaderBlue("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\blue.ps");
     Shader shaderYellow("x64\\Debug\\shader\\shader.vs", "x64\\Debug\\shader\\yellow.ps");
+    Shader shaderNormal("x64\\Debug\\shader\\shadernormal.vs", "x64\\Debug\\shader\\green.ps", "x64\\Debug\\shader\\house.gs");
     
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -388,6 +389,12 @@ int main()
         shaderRed.setMat4("view", view);
         shaderRed.setMat4("model", model);
         ourModel.Draw(shaderRed);
+
+        shaderNormal.use();
+        shaderNormal.setMat4("projection", projection);
+        shaderNormal.setMat4("view", view);
+        shaderNormal.setMat4("model", model);
+        ourModel.Draw(shaderNormal);
 
         // 第二处理阶段
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // 返回默认
