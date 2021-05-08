@@ -94,7 +94,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 55.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -238,37 +238,6 @@ int main()
     -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // 左下
     };
 
-    float tinyquadVertices[] = {
-        // 位置          // 颜色
-        -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-         0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-        -0.05f, -0.05f,  0.0f, 0.0f, 1.0f,
-
-        -0.05f,  0.05f,  1.0f, 0.0f, 0.0f,
-         0.05f, -0.05f,  0.0f, 1.0f, 0.0f,
-         0.05f,  0.05f,  0.0f, 1.0f, 1.0f
-    };
-
-    glm::vec2 translations[100];
-    int index = 0;
-    float offset = 0.1f;
-    for (int y = -10; y < 10; y += 2)
-    {
-        for (int x = -10; x < 10; x += 2)
-        {
-            glm::vec2 translation;
-            translation.x = (float)x / 10.0f + offset;
-            translation.y = (float)y / 10.0f + offset;
-            translations[index++] = translation;
-        }
-    }
-
-    unsigned int instanceVBO;
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     // cube VAO
     unsigned int cubeVAO, cubeVBO;
     glGenVertexArrays(1, &cubeVAO);
@@ -293,53 +262,45 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glBindVertexArray(0);
-    // TinyQuad VAO
-    unsigned int tinyquadVAO, tinyquadVBO;
-    glGenVertexArrays(1, &tinyquadVAO);
-    glGenBuffers(1, &tinyquadVBO);
-    glBindVertexArray(tinyquadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, tinyquadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(tinyquadVertices), tinyquadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
-    // also set instance data
-    glEnableVertexAttribArray(2);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(2, 1); // tell OpenGL this is an instanced vertex attribute.
-
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    // 生成纹理
-    unsigned int texColorBuffer;
-    glGenTextures(1, &texColorBuffer);
-    glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // 将它附加到当前绑定的帧缓冲对象
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     Model ourModel(FileSystem::getPath("res/nanosuit/nanosuit.obj"));
+
+    Model rock(FileSystem::getPath("res/rock/rock.obj"));
+    Model planet(FileSystem::getPath("res/planet/planet.obj"));
+
+    // generate a large list of semi-random model transformation matrices
+    // ------------------------------------------------------------------
+    unsigned int amount = 10000;
+    glm::mat4* modelMatrices;
+    modelMatrices = new glm::mat4[amount];
+    srand(glfwGetTime()); // initialize random seed	
+    float radius = 50.0;
+    float offset = 2.5f;
+    for (unsigned int i = 0; i < amount; i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        // 1. translation: displace along circle with 'radius' in range [-offset, offset]
+        float angle = (float)i / (float)amount * 360.0f;
+        float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float x = sin(angle) * radius + displacement;
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+        displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
+        float z = cos(angle) * radius + displacement;
+        model = glm::translate(model, glm::vec3(x, y, z));
+
+        // 2. scale: Scale between 0.05 and 0.25f
+        float scale = (rand() % 20) / 100.0f + 0.05;
+        model = glm::scale(model, glm::vec3(scale));
+
+        // 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
+        float rotAngle = (rand() % 360);
+        model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+        // 4. now add to list of matrices
+        modelMatrices[i] = model;
+    }
+
 
     // render loop
     // -----------
@@ -363,10 +324,27 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        // configure transformation matrices
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+        glm::mat4 view = camera.GetViewMatrix();;
         shader.use();
-        glBindVertexArray(tinyquadVAO);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100); // 100 triangles of 6 vertices each
-        glBindVertexArray(0);
+        shader.setMat4("projection", projection);
+        shader.setMat4("view", view);
+
+        // draw planet
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
+        shader.setMat4("model", model);
+        planet.Draw(shader);
+
+        // draw meteorites
+        for (unsigned int i = 0; i < amount; i++)
+        {
+            shader.setMat4("model", modelMatrices[i]);
+            rock.Draw(shader);
+        }
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
